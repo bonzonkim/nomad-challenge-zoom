@@ -21,9 +21,13 @@ wss.on("connection", (socket) => {
     sockets.push(socket);
     socket.on("close", () => console.log("disconnected from the browser"))
     socket.on("message", (message) => {
-        sockets.forEach(aSocket => aSocket.send(message) )
-        //socket.send(message.toString('utf8'))
+        const parsedData = JSON.parse(message);
+        switch(parsedData.type) {
+            case "message":
+                sockets.forEach(aSocket => aSocket.send(`${socket.nickname}: ${parsedData.data}`) )
+            case "nickname":
+                socket["nickname"] = parsedData.data;
+        }
     })
-    socket.send("hello from server")
 })
 server.listen(3000, handleListen)
